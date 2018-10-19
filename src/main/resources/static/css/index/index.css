@@ -1,0 +1,158 @@
+.add, .list {
+	width: 200px;
+	height: 100px;
+	border: 1px solid #f6c1c1;
+	text-align: center;
+	line-height: 95px;
+	background: #f6c1c1;
+	float: left;
+}
+
+.add {
+	margin-right: 84px;
+}
+
+a {
+	text-decoration-line: none;
+}
+
+a:HOVER {
+	color: #673AB7;
+}
+
+body {
+	background: #f0efef;
+}
+
+.container {
+	margin-left: 36%;
+	margin-top: 10%;
+}
+
+input {
+	height: 22px;
+}
+
+.form {
+	width: 14%;
+	border: 1px solid;
+	padding: 55px;
+}
+
+.group {
+	margin-bottom: 6px;
+}
+
+.btn {
+	width: 81px;
+	height: 36px;
+	background-color: #9E9E9E;
+	color: white;
+	border: none;
+	cursor: pointer;
+}
+
+.btn-info{
+	background-color: blue;
+}
+
+.submit>input {
+	margin-left: 50px;
+	margin-top: 14px;
+}
+
+.submit {
+	margin-bottom: -28px;
+}
+
+.table {
+	width: 54%;
+	height: 100%;
+	border-collapse: collapse;
+}
+
+.table>tbody>tr>td {
+	text-align: center;
+}
+
+/* .table>tbody>tr:hover:nth-child(odd) {
+	background-color: #d1cbd0;
+	color: white;
+}
+
+.table>tbody>tr:hover:nth-child(even) {
+	background-color: blue;
+	color: white;
+} */
+/**
+ * 去掉td的边框线
+ */
+.table tr td {
+	border-left: 0px;
+	border-right: 0px;
+	outline: none;
+	padding:3px 4px;
+}
+
+.table tr th {
+	border-left: 0px;
+	border-right: 0px;
+	outline: none;
+}
+
+.back {
+	margin-left: 23%;
+	margin-top: 1%;
+}
+
+.upd{
+	font-size: 14px;
+}
+
+.tipMsg{
+	width: 53%;
+    height: 100%;
+   	background-color: #dff0d8;
+   	border-color: #d6e9c6;
+    color: #468847;
+    margin-bottom: 10px;
+}
+
+.tipMsg>.close{
+    position: absolute;
+    right: 30%;
+    top: 191px;
+    cursor: pointer;
+    background-color: #dff0d8;
+    border-style: none;
+}
+
+
+/**
+	分页
+**/
+.page>ul{
+	list-style: none;
+}
+
+.page>ul>li{
+	float: left;
+	padding: 2px;
+}
+.page>ul>li>a{
+	font-size: 14px;
+}
+
+.page{
+	float: right;
+    position: relative;
+    right: 46%;
+}
+
+span{
+	font-size: 14px;
+}
+
+.hide{
+	display: none;
+}

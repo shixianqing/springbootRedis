@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>学生信息列表展示</title>
+<link rel="stylesheet" type="text/css" href="/css/index/index.css" />
+<link rel="shortcut icon" href="/images/favicon.ico">
+<script type="text/javascript" src="/webjars/jquery/2.1.4/jquery.js"></script>
+<script type="text/javascript" src="/js/common.js"></script>
+<script th:inline="javascript"  >
+        
+        $(function(){
+        	var params= [[${params}]];
+            var totalPages = params.totalPages;
+            var isNextPage = params.isNextPage;
+            var html = '';
+            for(var i=1;i<=totalPages;i++){
+            	if(i==1){
+            		html+='<li><a href="/student/list?pageNo='+i+'" style="color:red" class="num"><'+i+'></a></li>';
+            		continue;
+            	}
+           		if(isNextPage&&i>2){
+           			html+='<li class="hide"><a href="/student/list?pageNo='+i+'" class="num"><'+i+'></a></li>';
+           		}else{
+	           		html+='<li><a href="/student/list?pageNo='+i+'" class="num"><'+i+'></a></li>'
+           		}
+            }
+            $(".page").find("li:eq(1)").after(html);
+            if(params.pageNo){
+            	var pageNo = parseInt(params.pageNo);
+            	if(params.next){
+            		if(pageNo>2){
+            			$("li").hide();
+            			$("li:eq(0)").show();
+            			$("li:eq(1)").show();
+            			$("li:eq("+(pageNo+1)+")").show();
+            			$("li:eq("+(pageNo)+")").show();
+            		}
+            		if(pageNo==totalPages){
+            			$("li:last-child").hide();
+            		}
+            		
+            	}else if(params.prev){
+            		if(pageNo==2 || pageNo==1){
+            			$("li").hide();
+            			$("li:eq(0)").show();
+            			$("li:eq(1)").hide();
+            			$("li:eq(2)").show();
+            			$("li:eq(3)").show();
+            			$("li:last-child").show();
+
+            		}else if(pageNo>2){
+            			$("li").hide();
+            			$("li:eq(0)").show();
+            			$("li:eq(1)").show();
+            			$("li:eq("+pageNo-1+")").show();
+            			$("li:eq("+pageNo+")").show();
+            		}
+            	}
+            	
+            	pageNo = pageNo-1;
+            	$(".num").css("color","");
+            	$(".num:eq("+pageNo+")").css("color","red");
+            }
+            var currPageNo = params.pageNo||1;
+            currPageNo = parseInt(currPageNo);
+            var nextPage = currPageNo+1;
+            var prevPage = currPageNo-1;
+            $(".next").attr("href","/student/list?pageNo="+nextPage+"&next="+true);
+            $(".prev").attr("href","/student/list?pageNo="+prevPage+"&prev="+true);
+        })
+        
+    </script>
+</head>
+<body>
+	<div class="container">
+		
+		<div class="tipMsg" th:style="${MSG==null?'display:none':'display:block'}">
+			<span th:text="${MSG}"></span>
+			<!-- <img src="/images/del.png"> -->
+			<button class="close">×</button>
+		</div>
+		<table class="table" cellpadding="0" cellspacing="0" border="1">
+			<caption>学生信息表</caption>
+			<thead>
+				<tr>
+					<th>序号</th>
+					<th>姓名</th>
+					<th>学号</th>
+					<th>操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="item:${list}">
+					<td th:text="${item.stuId}"></td>
+					<td th:text="${item.stuName}"></td>
+					<td th:text="${item.stuNo}"></td>
+					<td>
+						<a th:href="@{/student/toUpd?(stuId=${item.stuId})}" class="upd">修改</a>
+						<a th:href="@{/student/del?(stuId=${item.stuId})}" class="upd">删除</a>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		
+		<!-- 分页 -->
+		<div class="page">
+			<ul >
+				<li><span>【共</span><span style="font-size: 14px;" th:text="${params.totalPages}"></span><span>页】</span></li>
+				<li style="display: none" ><a href="#" class="prev">上一页</a></li>
+				<li  th:style="${params.isNextPage==true?'display:block':'display:none'}"><a href="#" class="next">下一页</a></li>
+			</ul>
+		</div>
+		
+		<button class="btn back" onclick="return YT.backIndex();">返回</button>
+	</div>
+</body>
+</html>
