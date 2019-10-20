@@ -1,9 +1,11 @@
-package com.example.demo.common.response;
+package com.example.demo.antiduplication.controller;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.example.demo.antiduplication.service.TokenService;
+import com.example.demo.common.response.ResponseVo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * *                            _ooOoo_
@@ -39,28 +41,20 @@ import lombok.NoArgsConstructor;
  *
  * @Author:shixianqing
  * @Date:2019/8/23 15:26
- * @Description:响应输出包装
- * **/
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class ResponseVo<T> {
+ * @Description:
+ **/
+@RestController
+@RequestMapping("/token")
+public class TokenController {
 
-    private T data;
-    private Integer statusCode;
+    @Autowired
+    private TokenService tokenService;
 
-    public static <T>ResponseVo<T> success(T data){
-
-        return new ResponseVo<>(data, 200);
-
+    @GetMapping("/create")
+    public ResponseVo<String> createToken(){
+        String token = tokenService.createToken();
+        return ResponseVo.success(token);
     }
-
-    public static <T>ResponseVo<T> error(T data){
-
-       return new ResponseVo<>(data,500);
-
-    }
-
 }
 
 

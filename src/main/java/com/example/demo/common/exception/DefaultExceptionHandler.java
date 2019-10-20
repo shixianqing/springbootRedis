@@ -1,9 +1,17 @@
-package com.example.demo.common.response;
+package com.example.demo.common.exception;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.alibaba.fastjson.JSONObject;
+import com.example.demo.common.response.ResponseVo;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 /**
  * *                            _ooOoo_
@@ -39,28 +47,28 @@ import lombok.NoArgsConstructor;
  *
  * @Author:shixianqing
  * @Date:2019/8/23 15:26
- * @Description:响应输出包装
- * **/
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class ResponseVo<T> {
+ * @Description: 全局异常处理器
+ **/
+@ControllerAdvice
+@Slf4j
+public class DefaultExceptionHandler {
+    @ResponseBody
+    @ExceptionHandler(Exception.class)
+    public ResponseVo handlerException(Exception e){
 
-    private T data;
-    private Integer statusCode;
+        log.error("=========exception============",e);
 
-    public static <T>ResponseVo<T> success(T data){
-
-        return new ResponseVo<>(data, 200);
-
+        return ResponseVo.error("系统错误，请稍候操作");
     }
 
-    public static <T>ResponseVo<T> error(T data){
 
-       return new ResponseVo<>(data,500);
+    @ResponseBody
+    @ExceptionHandler(BusinessException.class)
+    public ResponseVo handlerException(BusinessException e){
+        log.error("===========BusinessException==========",e);
 
+        return ResponseVo.error(e.getErrorMsg());
     }
-
 }
 
 

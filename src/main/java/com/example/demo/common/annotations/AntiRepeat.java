@@ -1,9 +1,8 @@
-package com.example.demo.common.response;
+package com.example.demo.common.annotations;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import sun.awt.SunHints;
+
+import java.lang.annotation.*;
 
 /**
  * *                            _ooOoo_
@@ -39,28 +38,11 @@ import lombok.NoArgsConstructor;
  *
  * @Author:shixianqing
  * @Date:2019/8/23 15:26
- * @Description:响应输出包装
- * **/
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class ResponseVo<T> {
-
-    private T data;
-    private Integer statusCode;
-
-    public static <T>ResponseVo<T> success(T data){
-
-        return new ResponseVo<>(data, 200);
-
-    }
-
-    public static <T>ResponseVo<T> error(T data){
-
-       return new ResponseVo<>(data,500);
-
-    }
-
+ * @Description: 防重复注解
+ **/
+@Retention(value = RetentionPolicy.RUNTIME)
+@Target(value = ElementType.METHOD)
+public @interface AntiRepeat {
 }
 
 

@@ -77,19 +77,23 @@ public class RedisService {
 	}
 
 	@SuppressWarnings("unchecked")
-	public void del(String... key) {
+	public List<Long> del(String... key) {
+		List<Long> results = new ArrayList<>();
 		redisTemplate.execute(new RedisCallback<Object>() {
 
 			@Override
 			public Object doInRedis(RedisConnection connection)
 					throws DataAccessException {
 				for(int i=0;i<key.length;i++){
-					connection.del(key[i].getBytes());
+					Long result = connection.del(key[i].getBytes());
+					results.add(result);
 				}
 				return 1L;
 			}
 			
 		});
+
+		return results;
 	}
 	
 	@SuppressWarnings("unchecked")

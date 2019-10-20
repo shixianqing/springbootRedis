@@ -1,9 +1,11 @@
-package com.example.demo.common.response;
+package com.example.demo.controller;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.alibaba.fastjson.JSONObject;
+import com.example.demo.common.annotations.AntiRepeat;
+import com.example.demo.common.response.ResponseVo;
+import com.example.demo.model.Order;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * *                            _ooOoo_
@@ -39,28 +41,22 @@ import lombok.NoArgsConstructor;
  *
  * @Author:shixianqing
  * @Date:2019/8/23 15:26
- * @Description:响应输出包装
- * **/
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class ResponseVo<T> {
+ * @Description:
+ **/
+@RestController
+@Slf4j
+@RequestMapping("/order")
+public class OrderController {
 
-    private T data;
-    private Integer statusCode;
+    @PostMapping("/add")
+    @AntiRepeat
+    public ResponseVo add(@RequestBody Order order){
 
-    public static <T>ResponseVo<T> success(T data){
+        log.info("新增订单：{}", JSONObject.toJSONString(order,true));
 
-        return new ResponseVo<>(data, 200);
-
-    }
-
-    public static <T>ResponseVo<T> error(T data){
-
-       return new ResponseVo<>(data,500);
+        return ResponseVo.success("订单新增成功");
 
     }
-
 }
 
 

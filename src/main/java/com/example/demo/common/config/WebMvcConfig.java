@@ -1,9 +1,11 @@
-package com.example.demo.common.response;
+package com.example.demo.common.config;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.example.demo.antiduplication.service.TokenService;
+import com.example.demo.common.interceptors.TokenInterceptor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.DelegatingWebMvcConfiguration;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 
 /**
  * *                            _ooOoo_
@@ -39,28 +41,19 @@ import lombok.NoArgsConstructor;
  *
  * @Author:shixianqing
  * @Date:2019/8/23 15:26
- * @Description:响应输出包装
- * **/
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class ResponseVo<T> {
+ * @Description:
+ **/
+@Configuration
+public class WebMvcConfig extends DelegatingWebMvcConfiguration {
 
-    private T data;
-    private Integer statusCode;
+    @Autowired
+    private TokenService tokenService;
 
-    public static <T>ResponseVo<T> success(T data){
-
-        return new ResponseVo<>(data, 200);
-
+    @Override
+    protected void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(new TokenInterceptor(tokenService));
+        super.addInterceptors(registry);
     }
-
-    public static <T>ResponseVo<T> error(T data){
-
-       return new ResponseVo<>(data,500);
-
-    }
-
 }
 
 

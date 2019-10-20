@@ -1,9 +1,14 @@
-package com.example.demo.common.response;
+package com.example.demo.common.interceptors;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.example.demo.antiduplication.service.TokenService;
+import com.example.demo.common.annotations.AntiRepeat;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * *                            _ooOoo_
@@ -39,28 +44,27 @@ import lombok.NoArgsConstructor;
  *
  * @Author:shixianqing
  * @Date:2019/8/23 15:26
- * @Description:响应输出包装
- * **/
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class ResponseVo<T> {
+ * @Description:
+ **/
+@Slf4j
+public class TokenInterceptor extends HandlerInterceptorAdapter {
 
-    private T data;
-    private Integer statusCode;
+    private TokenService tokenService;
 
-    public static <T>ResponseVo<T> success(T data){
-
-        return new ResponseVo<>(data, 200);
-
+    public TokenInterceptor(TokenService tokenService){
+        this.tokenService = tokenService;
     }
 
-    public static <T>ResponseVo<T> error(T data){
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
-       return new ResponseVo<>(data,500);
-
+        HandlerMethod handlerMethod = (HandlerMethod) handler;
+        log.info("方法名：{}",handlerMethod.getMethod().getName());
+        if (handlerMethod.hasMethodAnnotation(AntiRepeat.class)){
+            tokenService.checkToken(request);
+        }
+        return super.preHandle(request, response, handler);
     }
-
 }
 
 

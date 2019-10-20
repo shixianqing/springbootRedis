@@ -12,5 +12,5 @@ public class Consts {
 	public static final String PAGE_NO = "pageNo";
 	public static final String PAGE_SIZE = "pageSize";
 	
-	public static final long TIME_OUT=300;
+	public static final long TIME_OUT=300000;
 }

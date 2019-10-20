@@ -1,10 +1,5 @@
 package com.example.demo.common.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 /**
  * *                            _ooOoo_
  * *                           o8888888o
@@ -39,28 +34,25 @@ import lombok.NoArgsConstructor;
  *
  * @Author:shixianqing
  * @Date:2019/8/23 15:26
- * @Description:响应输出包装
- * **/
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class ResponseVo<T> {
+ * @Description:
+ **/
+public enum ResponseCode {
 
-    private T data;
-    private Integer statusCode;
+    SUCCESS(200),FAIL(520);
 
-    public static <T>ResponseVo<T> success(T data){
+    private Integer code;
 
-        return new ResponseVo<>(data, 200);
-
+    ResponseCode(Integer code){
+        this.code = code;
     }
 
-    public static <T>ResponseVo<T> error(T data){
-
-       return new ResponseVo<>(data,500);
-
+    public Integer getCode() {
+        return code;
     }
 
+    public void setCode(Integer code) {
+        this.code = code;
+    }
 }
 
 

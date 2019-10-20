@@ -1,9 +1,6 @@
-package com.example.demo.common.response;
+package com.example.demo.antiduplication.service;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * *                            _ooOoo_
@@ -39,28 +36,13 @@ import lombok.NoArgsConstructor;
  *
  * @Author:shixianqing
  * @Date:2019/8/23 15:26
- * @Description:响应输出包装
- * **/
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class ResponseVo<T> {
+ * @Description:
+ **/
+public interface TokenService {
 
-    private T data;
-    private Integer statusCode;
+    String createToken();
 
-    public static <T>ResponseVo<T> success(T data){
-
-        return new ResponseVo<>(data, 200);
-
-    }
-
-    public static <T>ResponseVo<T> error(T data){
-
-       return new ResponseVo<>(data,500);
-
-    }
-
+    boolean checkToken(HttpServletRequest request);
 }
 
 

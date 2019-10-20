@@ -1,9 +1,4 @@
-package com.example.demo.common.response;
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+package com.example.demo.common.exception;
 
 /**
  * *                            _ooOoo_
@@ -39,28 +34,38 @@ import lombok.NoArgsConstructor;
  *
  * @Author:shixianqing
  * @Date:2019/8/23 15:26
- * @Description:响应输出包装
- * **/
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class ResponseVo<T> {
+ * @Description:
+ **/
+public class BusinessException extends RuntimeException {
 
-    private T data;
-    private Integer statusCode;
+    private Integer errorCode;
 
-    public static <T>ResponseVo<T> success(T data){
+    private String errorMsg;
 
-        return new ResponseVo<>(data, 200);
-
+    public BusinessException(Integer errorCode,String errorMsg){
+        super(errorMsg);
+        this.errorCode = errorCode;
+        this.errorMsg = errorMsg;
     }
 
-    public static <T>ResponseVo<T> error(T data){
-
-       return new ResponseVo<>(data,500);
-
+    public BusinessException() {
     }
 
+    public Integer getErrorCode() {
+        return errorCode;
+    }
+
+    public void setErrorCode(Integer errorCode) {
+        this.errorCode = errorCode;
+    }
+
+    public String getErrorMsg() {
+        return errorMsg;
+    }
+
+    public void setErrorMsg(String errorMsg) {
+        this.errorMsg = errorMsg;
+    }
 }
 
 

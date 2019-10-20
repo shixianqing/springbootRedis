@@ -1,9 +1,8 @@
-package com.example.demo.common.response;
+package com.example.demo.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+
+import java.util.Date;
 
 /**
  * *                            _ooOoo_
@@ -39,28 +38,14 @@ import lombok.NoArgsConstructor;
  *
  * @Author:shixianqing
  * @Date:2019/8/23 15:26
- * @Description:响应输出包装
- * **/
+ * @Description:
+ **/
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class ResponseVo<T> {
+public class Order {
 
-    private T data;
-    private Integer statusCode;
+    private String orderNo;
 
-    public static <T>ResponseVo<T> success(T data){
-
-        return new ResponseVo<>(data, 200);
-
-    }
-
-    public static <T>ResponseVo<T> error(T data){
-
-       return new ResponseVo<>(data,500);
-
-    }
-
+    private Date orderDate;
 }
 
 

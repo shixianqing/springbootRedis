@@ -37,26 +37,24 @@ public class RedisController {
 		JSONObject jsonObject = new JSONObject();
 		jsonObject.put("STATUS", "OK");
 		jsonObject.put("DATE", DateUtils.format(new Date(), Locale.CHINA));
-		return ResponseVo.builder().build().success(jsonObject);
+		return ResponseVo.success(jsonObject);
 	}
 	
 	@RequestMapping("/get/{key}")
 	public ResponseVo get(@PathVariable String key){
 		String value = redisService.get(key);
-		return ResponseVo.builder().build().success(value);
+		return ResponseVo.success(value);
 	}
 	
 	
 	@RequestMapping("/del/{key}")
 	public ResponseVo del(@PathVariable String key){
-        ResponseVo<Object> responseVo = ResponseVo.builder().build();
         redisService.del(key);
 		if(!redisService.exsit(key)){
-            responseVo.success(key+"：删除成功");
+            return ResponseVo.success(key+"：删除成功");
 		}else {
-            responseVo.success(key+"：删除失败");
+            return ResponseVo.error(key+"：删除失败");
 		}
-		return responseVo;
 	}
 	
 	@RequestMapping("/hset/{key}/{field}/{value}")
@@ -64,7 +62,7 @@ public class RedisController {
 			@PathVariable Object value){
 		redisService.hset(key, field, value);
 
-		return ResponseVo.builder().build().success("key："+key+"，field："+field+"，" +
+		return ResponseVo.success("key："+key+"，field："+field+"，" +
                 "value："+value+"，设置成功");
 	}
 	
@@ -77,7 +75,7 @@ public class RedisController {
 		jsonObject.put("VALUE", obj);
 		jsonObject.put("STATUS", "OK");
 		jsonObject.put("DATE", DateUtils.format(new Date(), Locale.CHINA));
-		return ResponseVo.builder().build().success(jsonObject);
+		return ResponseVo.success(jsonObject);
 	}
 	
 	@RequestMapping("/hset/{key}")
@@ -86,14 +84,14 @@ public class RedisController {
 		map.put("KEY", key);
 		map.put("STATUS", "OK");
 		map.put("DATE", DateUtils.format(new Date(), Locale.CHINA));
-		return ResponseVo.builder().build().success(map);
+		return ResponseVo.success(map);
 	}
 	
 	
 	
 	@RequestMapping("/keys/{pattern}")
 	public ResponseVo keys(@PathVariable String pattern){
-		return ResponseVo.builder().build().success(redisService.keys(pattern));
+		return ResponseVo.success(redisService.keys(pattern));
 	}
 
 
