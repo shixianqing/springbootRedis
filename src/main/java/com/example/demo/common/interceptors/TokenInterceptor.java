@@ -1,5 +1,6 @@
 package com.example.demo.common.interceptors;
 
+import com.alibaba.fastjson.JSONObject;
 import com.example.demo.antiduplication.service.TokenService;
 import com.example.demo.common.annotations.AntiRepeat;
 import lombok.extern.slf4j.Slf4j;
@@ -58,6 +59,10 @@ public class TokenInterceptor extends HandlerInterceptorAdapter {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
+        if (!(handler instanceof HandlerMethod)){
+            log.info("handler：{}", JSONObject.toJSONString(handler,true));
+            return true;
+        }
         HandlerMethod handlerMethod = (HandlerMethod) handler;
         log.info("方法名：{}",handlerMethod.getMethod().getName());
         if (handlerMethod.hasMethodAnnotation(AntiRepeat.class)){
