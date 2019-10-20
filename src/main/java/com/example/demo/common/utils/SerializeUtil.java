@@ -1,4 +1,4 @@
-package com.example.demo.utils;
+package com.example.demo.common.utils;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

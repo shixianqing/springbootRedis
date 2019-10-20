@@ -1,6 +1,4 @@
-package com.example.demo.utils;
-
-import com.example.demo.table.Student;
+package com.example.demo.common.utils;
 
 import java.lang.reflect.Field;
 import java.text.MessageFormat;

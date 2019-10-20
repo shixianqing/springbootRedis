@@ -19,7 +19,7 @@ import org.springframework.data.redis.core.types.Expiration;
 import org.springframework.stereotype.Component;
 
 import com.example.demo.ns.Consts;
-import com.example.demo.utils.SerializeUtil;
+import com.example.demo.common.utils.SerializeUtil;
 
 @Component
 public class RedisService {
