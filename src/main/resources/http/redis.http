@@ -1,0 +1,19 @@
+### 添加key、value
+GET http://localhost:8088/redis/add/name/张三
+
+### 通过key，获取value
+GET http://localhost:8088/redis/get/foo
+
+### keys
+GET http://localhost:8088/redis/keys/*
+
+###
+GET http://localhost:8088/redis/setNX?lockKey=name&value=123
+
+###
+GET http://localhost:8088/redis/releaseLock?lockKey=name&value=123
+
+### 生成序号
+GET http://localhost:8088/redis/seq/test
+
+###

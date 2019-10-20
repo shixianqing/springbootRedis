@@ -3,6 +3,7 @@ package com.example.demo.service.impl;
 import java.util.List;
 import java.util.Map;
 
+import com.example.demo.utils.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -13,7 +14,6 @@ import com.example.demo.dao.repository.StudentRepository;
 import com.example.demo.ns.Consts;
 import com.example.demo.service.StudentService;
 import com.example.demo.table.Student;
-import com.study.util.StringUtil;
 
 @Service
 public class StudentServiceImpl implements StudentService {

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.demo.dao.SeqNumMapper" >
+
+    <resultMap id="baseResultMap" type="com.example.demo.model.BatchNoSeq">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="current_value" property="currentValue" jdbcType="VARCHAR"/>
+        <result column="company_code" property="companyCode" jdbcType="VARCHAR"/>
+        <result column="curr_date" property="currentDate" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <select id="getNextValue" resultMap="baseResultMap">
+        select
+            id,current_value,company_code,curr_date
+        from
+            batch_no_seq
+        where
+            company_code = #{code,jdbcType=VARCHAR}
+    </select>
+
+    <insert id="insert" parameterType="com.example.demo.model.BatchNoSeq">
+        insert
+          into
+            batch_no_seq
+                (current_value,company_code,curr_date)
+          values
+                (#{currentValue,jdbcType=VARCHAR},#{companyCode,jdbcType=VARCHAR},#{currentDate,jdbcType=VARCHAR})
+    </insert>
+
+    <update id="update" parameterType="com.example.demo.model.BatchNoSeq">
+        update
+            batch_no_seq
+        set
+            current_value = #{currentValue,jdbcType=VARCHAR},
+            curr_date = #{currentDate,jdbcType=VARCHAR}
+        where
+            company_code = #{companyCode,jdbcType=VARCHAR}
+
+    </update>
+
+</mapper>

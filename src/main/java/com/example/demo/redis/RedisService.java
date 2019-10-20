@@ -11,21 +11,21 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.connection.RedisStringCommands;
+import org.springframework.data.redis.connection.ReturnType;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.types.Expiration;
 import org.springframework.stereotype.Component;
 
 import com.example.demo.ns.Consts;
 import com.example.demo.utils.SerializeUtil;
-import com.study.util.LoggerUtil;
 
 @Component
 public class RedisService {
 
 	@Autowired
 	private RedisTemplate redisTemplate;
-	
-	LoggerUtil logger = LoggerUtil.getInstance(getClass());
 	
 	@SuppressWarnings("unchecked")
 	public void set(final byte[] key,final byte[] value,final long liveTime){
@@ -215,6 +215,44 @@ public class RedisService {
 			}
 			
 		});
+	}
+
+
+	/**
+	 *
+	 * @param key
+	 * @param value
+	 * @param expireTime 毫秒
+	 * @return
+	 */
+	public boolean tryGetDistributedLock(String key,String value,Long expireTime){
+
+		return (boolean) redisTemplate.execute((RedisCallback<Boolean>) redisConnection -> {
+			Boolean isSucess = redisConnection.set(key.getBytes(),value.getBytes(),
+					Expiration.milliseconds(expireTime),
+					RedisStringCommands.SetOption.SET_IF_ABSENT);
+			return isSucess;
+		});
+
+	}
+
+
+	/**
+	 * 释放锁
+	 * @param key
+	 * @param value
+	 * @return
+	 */
+	public boolean releaseDistributedLock(String key,String value){
+		String script = "if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return " +
+				"0 end";
+		Long result =
+				(Long) redisTemplate.execute((RedisCallback<Long>) redisConnection ->redisConnection.eval(script.getBytes(),
+				ReturnType.INTEGER,1,
+				key.getBytes(),value.getBytes())
+		);
+
+		return 0 == result ? false : true;
 	}
 }
 
