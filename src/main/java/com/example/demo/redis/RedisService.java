@@ -1,13 +1,10 @@
 package com.example.demo.redis;
 
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.nio.ByteBuffer;
+import java.util.*;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.connection.RedisConnection;
@@ -16,12 +13,15 @@ import org.springframework.data.redis.connection.ReturnType;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.types.Expiration;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.stereotype.Component;
 
 import com.example.demo.ns.Consts;
 import com.example.demo.common.utils.SerializeUtil;
 
 @Component
+@Slf4j
 public class RedisService {
 
 	@Autowired
@@ -34,10 +34,8 @@ public class RedisService {
 			public Object doInRedis(RedisConnection connection)
 					throws DataAccessException {
 				
-				connection.set(key, value);
-				if(liveTime!=0){
-					connection.expire(key, liveTime);
-				}
+				connection.set(key,value,Expiration.seconds(liveTime),
+						RedisStringCommands.SetOption.SET_IF_PRESENT);
 				return 1L;
 			}
 			
@@ -119,10 +117,51 @@ public class RedisService {
 					throws DataAccessException {
 				return connection.hSet(key, field, value);
 			}
-			
+
 		});
 	}
-	
+
+
+    /**
+     * 多变量设置
+     * @param key
+     * @param map
+     */
+	public Boolean hmset(final Object key,Map<Object,Object> map){
+
+	    redisTemplate.opsForHash().putAll(key,map);
+	    return true;
+    }
+
+
+    /**
+     * 设置key自增长id
+     * @param key
+     * @return
+     */
+    public Long incrby(Object key){
+
+        Long increment = redisTemplate.opsForValue().increment(key);
+        return increment;
+    }
+
+    public Boolean sadd(Object key,Object... member){
+        Long add = redisTemplate.opsForSet().add(key, member);
+        return add > 0 ? true : false;
+    }
+
+    /**
+     * 获取指定key下的所有成员
+     * @param key
+     * @return
+     */
+    public Set<Integer> smembers(Object key){
+
+        Set<Integer> members = redisTemplate.opsForSet().members(key);
+        return members;
+    }
+
+
 	/**
 	 * 设置hash值
 	 *	@param key
@@ -131,29 +170,16 @@ public class RedisService {
 	 *	void
 	 */
 	public void hset(Object key,Object field,Object value){
-		hset(SerializeUtil.serialize(key), SerializeUtil.serialize(field), SerializeUtil.serialize(value));
+		redisTemplate.opsForHash().put(key,field,value);
 	}
+
+
 	
 	@SuppressWarnings("unchecked")
 	public Object hget(Object key,Object field){
-		return redisTemplate.execute(new RedisCallback<Object>() {
-
-			@Override
-			public Object doInRedis(RedisConnection connection)
-					throws DataAccessException {
-				byte[] values = connection.hGet(SerializeUtil.serialize(key), SerializeUtil.serialize(field));
-				
-				try {
-					return SerializeUtil.unSerialize(values);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				return null;
-			}
-			
-		});
+		return redisTemplate.opsForHash().get(key,field);
 	}
-	
+
 	
 	/**
 	 * 根据key，获取以field为key，以value为值的集合
@@ -163,28 +189,8 @@ public class RedisService {
 	 */
 	@SuppressWarnings("unchecked")
 	public Map<Object,Object> hgetAll(Object key){
-		return (Map<Object, Object>) redisTemplate.execute(new RedisCallback<Object>() {
-
-			@Override
-			public Object doInRedis(RedisConnection connection)
-					throws DataAccessException {
-				Map<Object, Object> result = new HashMap<Object, Object>();
-				Map<byte[], byte[]>  map = connection.hGetAll(SerializeUtil.serialize(key));
-				Set<byte[]> keySet = map.keySet();
-				Iterator<byte[]> it =  keySet.iterator();
-				while(it.hasNext()){
-					byte[] key = it.next();
-					try {
-						result.put(SerializeUtil.unSerialize(key), SerializeUtil.unSerialize(map.get(key)));
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-				
-				return result;
-			}
-			
-		});
+        Map entries = redisTemplate.opsForHash().entries(key);
+        return entries;
 	}
 	
 	
@@ -241,7 +247,75 @@ public class RedisService {
 	}
 
 
+	public Boolean eval(String script,int numkeys,byte[]... keysAndArgs){
+
+       return (Boolean) redisTemplate.execute((RedisCallback<Boolean>) connection -> {
+           Integer eval = connection.eval(script.getBytes(), ReturnType.INTEGER, numkeys, keysAndArgs);
+           return eval > 0 ? true : false;
+       });
+    }
+
+    public Boolean zadd(Object key,double score,Object member){
+
+
+	    return redisTemplate.opsForZSet().add(key,member,score);
+    }
+
+    /**
+     * 获取分数
+     * @param key
+     * @param member
+     * @return
+     */
+    public Double zscore(Object key,Object member){
+        return redisTemplate.opsForZSet().score(key,member);
+    }
+
+    public Long hincrby(Object key,Object field,Long data){
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(new StringRedisSerializer());
+        Long increment = redisTemplate.opsForHash().increment(key, field, data);
+//        return (Double) redisTemplate.execute((RedisCallback<Double>) connection -> {
+//            Double result = connection.hIncrBy(SerializeUtil.serialize(key),
+//                    SerializeUtil.serialize(field), data);
+//            return result;
+//        });
+
+        redisTemplate.setKeySerializer(new GenericJackson2JsonRedisSerializer());
+        redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+
+        return increment;
+
+    }
+
+
+    /**
+     * 降序 获取指定key对应的成员
+     * @param key
+     * @param <T>
+     * @return
+     */
+    public <T> Set<T> zrevrange(Object key){
+		return redisTemplate.opsForZSet().reverseRange(key, 0, -1);
+    }
+
 	/**
+	 * 正序获取成员
+	 * @param key
+	 * @param <T>
+	 * @return
+	 */
+	public <T> Set<T> zrange (Object key){
+        return redisTemplate.opsForZSet().range(key,0,-1);
+    }
+
+
+    public Double zincrby(Object key,Object member,double incriment){
+        return redisTemplate.opsForZSet().incrementScore(key, member, incriment);
+    }
+
+
+    /**
 	 * 释放锁
 	 * @param key
 	 * @param value

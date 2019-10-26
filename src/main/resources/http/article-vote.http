@@ -1,0 +1,27 @@
+### 文章发布
+POST http://localhost:8088/article/post
+Content-Type: application/json
+
+{
+  "title": "赵薇：那个周什么雨，周冬雨秒回13字！网友：这情商堪比教科书",
+  "content": "周冬雨是娱乐界90后最好的女演员之一，在张艺谋的《山楂树之恋》开始熟悉观众之后，他的演艺生涯越来越好，除了外表和力量，",
+  "userId": 1
+}
+//{
+//  "title": "《越南驻英大使馆提请河静省三名失踪越南公民家庭提供相关信息材料配合调查》",
+//  "content": "​​越南驻英大使馆提请河静省三名失踪越南公民家庭配合调查",
+//  "userId": 3
+//}
+#{
+#  "title": "你对宠物的认知有多少",
+#  "content": "第一：狗狗是色盲？  每个人都认为狗是色盲，不能分辨它们是什么颜色。他们的眼睛里有黑色和白色。事实上，虽然狗能分辨的颜色比人类少，但它们仍然能分辨一些常见的基本颜色。",
+#  "userId": 2
+#}
+
+###
+GET http://localhost:8088/article/vote?articleId=3&userId=6
+
+###
+GET http://localhost:8088/article/list?sortField=2&sortType=2
+
+###
