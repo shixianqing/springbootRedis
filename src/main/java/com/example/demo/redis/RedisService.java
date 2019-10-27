@@ -83,7 +83,7 @@ public class RedisService {
 			public Object doInRedis(RedisConnection connection)
 					throws DataAccessException {
 				for(int i=0;i<key.length;i++){
-					Long result = connection.del(key[i].getBytes());
+					Long result = connection.del(redisTemplate.getKeySerializer().serialize(key[i]));
 					results.add(result);
 				}
 				return 1L;
@@ -247,11 +247,17 @@ public class RedisService {
 	}
 
 
-	public Boolean eval(String script,int numkeys,byte[]... keysAndArgs){
+	public List eval(String script,int numkeys,List<Object> keysAndArgs){
+	    byte[][] bytes = new byte[keysAndArgs.size()][keysAndArgs.size()];
+        for (int i = 0; i < keysAndArgs.size(); i++){
+            bytes[i] = redisTemplate.getKeySerializer().serialize(keysAndArgs.get(i));
 
-       return (Boolean) redisTemplate.execute((RedisCallback<Boolean>) connection -> {
-           Integer eval = connection.eval(script.getBytes(), ReturnType.INTEGER, numkeys, keysAndArgs);
-           return eval > 0 ? true : false;
+
+        }
+
+       return (List) redisTemplate.execute((RedisCallback<List>) connection -> {
+           List<Object> results = connection.eval(script.getBytes(), ReturnType.MULTI, numkeys, bytes);
+           return results;
        });
     }
 
@@ -332,5 +338,14 @@ public class RedisService {
 
 		return 0 == result ? false : true;
 	}
+
+
+
+	public Long lpush(Object key,Collection values){
+
+        Long aLong = redisTemplate.opsForList().leftPushAll(key, values);
+
+        return aLong;
+    }
 }
 

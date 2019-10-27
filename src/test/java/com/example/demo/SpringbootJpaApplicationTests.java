@@ -7,6 +7,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import com.example.demo.hongbao.service.GrabHongBaoService;
 import com.example.demo.service.SeqGenerator;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +38,9 @@ public class SpringbootJpaApplicationTests {
 
 	@Autowired
     private SeqGenerator seqGenerator;
+
+	@Autowired
+    private GrabHongBaoService grabHongBaoService;
 	
 	
 	@Test
@@ -102,6 +106,33 @@ public class SpringbootJpaApplicationTests {
         }
 
         poolExecutor.shutdown();
+    }
+
+
+    @Test
+    public void test(){
+		for (int i = 0; i< 20; i++){
+
+			double random = Math.random();
+			System.out.println(random * 100);
+		}
+	}
+
+
+    @Test
+    public void testGrabHongBao() throws Exception {
+
+
+        ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("hongbao-pool-%d").build();
+
+        ThreadPoolExecutor pool = new ThreadPoolExecutor(5,10,60,
+                TimeUnit.SECONDS,new LinkedBlockingQueue<>(1024), threadFactory);
+
+        for (int i = 0; i < 20; i++){
+            pool.execute(() -> grabHongBaoService.grabHongBao(UUID.randomUUID().toString()));
+        }
+
+//        pool.shutdown();
     }
 
 }

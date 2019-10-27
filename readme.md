@@ -1,6 +1,12 @@
 #redis应用
 
 ## redis+token实现接口幂等（防重复）
+### 实现
+ - 用户发交易前先获取一个token，并存于redis
+ - 发交易时，将获取到的token放在请求头中与交易报文一并传与后端
+ - 后端，在拦截器里获取请求头里的token
+ - 后端，判断请求头里的token是否在redis中存在，不存在，可能发生重复交易，存在则把token从redis中删除
+ - 后端，判断token是否删除成功，防止并发情况（一个请求执行到删除token那一步，还没将token删除掉，另一个请求也执行到删除token这一步，我们必须删除动作只能被成功执行一次）
 
 ## 文章投票
 ### 需求
@@ -17,3 +23,6 @@
 ### redis使用sql事务
  -  redisTemplate.setEnableTransactionSupport(true);
  -  方法上加 @Transactional(rollbackFor = Exception.class)
+ 
+## 计数器
+- incr方法，实现id自增
