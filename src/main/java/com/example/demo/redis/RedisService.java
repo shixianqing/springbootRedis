@@ -12,6 +12,7 @@ import org.springframework.data.redis.connection.RedisStringCommands;
 import org.springframework.data.redis.connection.ReturnType;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.data.redis.core.types.Expiration;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
@@ -247,19 +248,11 @@ public class RedisService {
 	}
 
 
-	public List eval(String script,int numkeys,List<Object> keysAndArgs){
-	    byte[][] bytes = new byte[keysAndArgs.size()][keysAndArgs.size()];
-        for (int i = 0; i < keysAndArgs.size(); i++){
-            bytes[i] = redisTemplate.getKeySerializer().serialize(keysAndArgs.get(i));
+	public Object eval(String script,List keys,Object... args){
 
-
-        }
-
-       return (List) redisTemplate.execute((RedisCallback<List>) connection -> {
-           List<Object> results = connection.eval(script.getBytes(), ReturnType.MULTI, numkeys, bytes);
-           return results;
-       });
-    }
+		Object result = redisTemplate.execute(RedisScript.of(script, Map.class), keys, args);
+		return result;
+	}
 
     public Boolean zadd(Object key,double score,Object member){
 

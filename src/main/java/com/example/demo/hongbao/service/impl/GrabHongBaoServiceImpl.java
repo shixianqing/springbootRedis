@@ -98,32 +98,36 @@ public class GrabHongBaoServiceImpl implements GrabHongBaoService {
     }
 
     /**
-     * 抢红包
-     * 1、判断红包池中，是否有红包，没有则返回0
-     * 2、有红包则判断该用户是否已抢过了，是则返回0，
-     * 3、用户没有抢过，则从红包哦池里弹出一个红包，并把用户并弹出的红包关联关系存于redis中。
+     * 1、判断用户是否已抢过红包，抢过，直接返回
+     * 2、没抢过，从红包池中弹出一个红包
+     * 3、判断红包是否存在？存在，将当前用户标记已抢，并把用户与红包关联详情放在list队列上，不存在，直接返回
+     *
+     * redis.call(command,keys...,args...)
+     * @param userId
      */
     @Override
     public void grabHongBao(String userId) {
         log.info("用户：{}，开始抢红包------------",userId);
 
-        String script = "if redis.call('HEXISTS',KEYS[2],KEYS[3]) ~= 0 then return {};\n" +
+        String script = "if redis.call('HEXISTS',KEYS[2],KEYS[3]) ~= 0 " +
+                "then return cjson.encode({userId=cjson.decode(KEYS[3]),msg=\"已抢过红包\"});\n" +
                 "else\n" +
                 "  local hongbao = redis.call('rpop',KEYS[1]);\n" +
                 "  if hongbao then\n" +
                 "    local x = cjson.decode(hongbao);\n" +
-                "    x['userId'] = KEYS[3];\n" +
+                //将编码后的userId，解码
+                "    x['userId'] = cjson.decode(KEYS[3]);\n" +
                 "    local re = cjson.encode(x);\n" +
                 "    redis.call('hset',KEYS[2],KEYS[3],1);\n" +
                 "    redis.call('lpush',KEYS[4],re);\n" +
                 "    return re;\n" +
                 "  end\n" +
-                "  return {};\n" +
+                "  return cjson.encode({userId=cjson.decode(KEYS[3]),msg=\"红包已被抢完\"});\n" +
                 "end";
-        List paramList = Arrays.asList(HONGBAO_POOL_KEY,HONGBAO_GRAB_RECORD_KEY,userId,HONGBAO_USER);
-        List results = redisService.eval(script, 4, paramList);
+        List keys = Arrays.asList(HONGBAO_POOL_KEY,HONGBAO_GRAB_RECORD_KEY,userId,HONGBAO_USER);
+        Object result = redisService.eval(script,keys);
 
-        log.info("抢完红包，返回值：{}",JSONObject.toJSONString(results));
+        log.info("抢完红包，返回值：{}",JSONObject.toJSONString(result));
 
     }
 }

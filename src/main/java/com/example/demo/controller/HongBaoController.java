@@ -65,7 +65,7 @@ public class HongBaoController {
         ThreadPoolExecutor pool = new ThreadPoolExecutor(5,10,60,
                 TimeUnit.SECONDS,new LinkedBlockingQueue<>(1024), threadFactory);
 
-        for (int i = 0; i < 1; i++){
+        for (int i = 0; i < 21; i++){
             pool.execute(() -> grabHongBaoService.grabHongBao(UUID.randomUUID().toString()));
         }
 
