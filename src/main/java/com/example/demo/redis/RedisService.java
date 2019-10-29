@@ -340,5 +340,15 @@ public class RedisService {
 
         return aLong;
     }
+
+    public Object pipeline(Object key,Object value){
+		return redisTemplate.executePipelined((RedisCallback<Object>) redisConnection -> {
+			redisConnection.openPipeline();
+			redisConnection.set(redisTemplate.getKeySerializer().serialize(key),
+					redisTemplate.getValueSerializer().serialize(value));
+			byte[] bytes = redisConnection.get(redisTemplate.getKeySerializer().serialize(key));
+			return redisTemplate.getValueSerializer().deserialize(bytes);
+		});
+	}
 }
 
